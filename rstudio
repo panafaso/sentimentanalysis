@@ -1,0 +1,28 @@
+library(tidytext)
+library(dplyr)
+
+# Your text
+text <- "Your text here..."
+
+# Convert the text into a tibble
+text_data <- tibble(line = 1, text = text)
+
+# Tokenize the data
+tidy_text <- text_data %>%
+  unnest_tokens(word, text)
+
+# Sentiment analysis using Bing lexicon
+bing_sentiments <- get_sentiments("bing")
+
+# Join with sentiment lexicon
+sentiment_analysis <- tidy_text %>%
+  inner_join(bing_sentiments, by = "word")
+
+# Summarize sentiment
+sentiment_summary <- sentiment_analysis %>%
+  count(sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment_score = positive - negative)
+
+# Print the sentiment summary
+print(sentiment_summary)
